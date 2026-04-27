@@ -38,7 +38,7 @@ def run_system(output_dir):
     for i in range(5):
         tx = {"id": f"tx{i}", "amount": i * 100}
         requests.post("http://localhost:8001/transaction", json=tx)
-        print(f"→ tx{i} sent")
+        print(f"→ tx{i}")
 
     # -------------------------
     # MINING
@@ -47,10 +47,10 @@ def run_system(output_dir):
 
     for i in range(3):
         requests.post("http://localhost:8001/mine")
-        print(f"→ block {i+1} mined")
+        print(f"→ block {i+1}")
         time.sleep(1)
 
-    # Give time for sync
+    # Allow sync
     time.sleep(4)
 
     # -------------------------
@@ -67,9 +67,10 @@ def run_system(output_dir):
             chains.append([])
 
     # -------------------------
-    # DASHBOARD (terminal)
+    # DASHBOARD
     # -------------------------
     print("\n📊 DASHBOARD\n")
+
     for i, c in enumerate(chains):
         print(f"Node {i+1}:")
         print(f"  Blocks: {len(c)}")
@@ -77,9 +78,15 @@ def run_system(output_dir):
         if c:
             last = c[-1]
             h = last.get("hash") or last.get("Hash")
-            print(f"  Last hash: {str(h)[:10]}...")
+            print(f"  Last hash: {str(h)[:12]}...")
 
         print()
+
+    # Show adversarial divergence explicitly
+    if len(chains) >= 3 and chains[2]:
+        last = chains[2][-1]
+        h = last.get("hash") or last.get("Hash")
+        print(f"⚠️ Adversarial node hash: {h[:12]}...\n")
 
     # Cleanup
     for p in procs:

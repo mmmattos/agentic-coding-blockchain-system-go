@@ -45,7 +45,7 @@ def generate_system(plan, base):
     """)
 
     # ------------------------
-    # blockchain.go (FIXED JSON TAGS)
+    # blockchain.go
     # ------------------------
     write(f"{base}/blockchain.go", """
     package main
@@ -176,3 +176,71 @@ def generate_system(plan, base):
         }
     }
     """)
+
+    # ------------------------
+    # run.sh (NEW 🚀)
+    # ------------------------
+    write(f"{base}/run.sh", """
+    #!/bin/bash
+
+    echo "🚀 Starting blockchain nodes..."
+
+    PORT=8001 go run . &
+    PID1=$!
+
+    PORT=8002 go run . &
+    PID2=$!
+
+    PORT=8003 ADVERSARIAL=true go run . &
+    PID3=$!
+
+    echo "Nodes running:"
+    echo " - Node1 :8001"
+    echo " - Node2 :8002"
+    echo " - Node3 :8003 (adversarial)"
+
+    sleep 3
+
+    echo ""
+    echo "📥 Sending transactions..."
+
+    for i in {1..5}
+    do
+      curl -s -X POST http://localhost:8001/transaction \
+        -H "Content-Type: application/json" \
+        -d "{\\"id\\":\\"tx$i\\",\\"amount\\":$((i*100))}"
+      echo "→ tx$i"
+    done
+
+    echo ""
+    echo "⛏ Mining..."
+
+    for i in {1..3}
+    do
+      curl -s -X POST http://localhost:8001/mine
+      echo "→ block $i"
+      sleep 1
+    done
+
+    sleep 3
+
+    echo ""
+    echo "📊 Fetching chains..."
+
+    for port in 8001 8002 8003
+    do
+      echo ""
+      echo "Node $port:"
+      curl -s http://localhost:$port/chain
+    done
+
+    echo ""
+    echo "🛑 Stopping nodes..."
+
+    kill $PID1 $PID2 $PID3
+
+    echo "Done."
+    """)
+
+    # Make it executable (important)
+    os.chmod(f"{base}/run.sh", 0o755)

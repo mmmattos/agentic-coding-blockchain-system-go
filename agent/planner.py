@@ -1,1 +1,2 @@
-def plan_system(goal): return ['blockchain']
+def plan_system(goal):
+    return ["blockchain", "nodes", "validation"]
