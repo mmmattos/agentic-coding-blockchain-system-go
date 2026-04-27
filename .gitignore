@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+.venv/
+venv/
+
+# Generated projects (ignore agent output)
+generated_go/
+
+# OS
+.DS_Store

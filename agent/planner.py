@@ -1,0 +1,1 @@
+def plan_system(goal): return ['blockchain']
